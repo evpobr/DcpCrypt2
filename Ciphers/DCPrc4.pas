@@ -33,7 +33,7 @@ type
   protected
     KeyData, KeyOrg: array[0..255] of byte;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -49,7 +49,7 @@ type
 implementation
 {$R-}{$Q-}
 
-class function TDCP_rc4.GetID: integer;
+class function TDCP_rc4.GetId: integer;
 begin
   Result:= DCP_rc4;
 end;

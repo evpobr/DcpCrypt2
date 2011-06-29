@@ -35,7 +35,7 @@ type
     Rounds: longword;
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -62,7 +62,7 @@ begin
   Result:= 128;
 end;
 
-class function TDCP_cast128.GetID: integer;
+class function TDCP_cast128.GetId: integer;
 begin
   Result:= DCP_cast128;
 end;

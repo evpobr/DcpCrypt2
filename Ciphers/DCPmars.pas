@@ -34,7 +34,7 @@ type
     KeyData: array[0..39] of DWord;
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -60,7 +60,7 @@ begin
   RRot32:= (X shr c) or (X shl (32 - c));
 end;
 
-class function TDCP_mars.GetID: integer;
+class function TDCP_mars.GetId: integer;
 begin
   Result:= DCP_mars;
 end;

@@ -47,7 +47,7 @@ type
     sbox: array[0..3,0..255] of DWord;
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -68,7 +68,7 @@ var
   MDS: array[0..3,0..255] of dword;
   MDSDone: boolean;
 
-class function TDCP_twofish.GetID: integer;
+class function TDCP_twofish.GetId: integer;
 begin
   Result:= DCP_twofish;
 end;

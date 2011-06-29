@@ -275,6 +275,7 @@ begin
   TestHash.Free;
 end;
 
+{$WARNINGS OFF}
 procedure TDCP_sha384.Init;
 begin
   Burn;
@@ -288,6 +289,7 @@ begin
   CurrentHash[7]:= $47b5481dbefa4fa4;
   fInitialized:= true;
 end;
+{$WARNINGS ON}
 
 procedure TDCP_sha384.Final(var Digest);
 begin
@@ -353,6 +355,7 @@ begin
   TestHash.Free;
 end;
 
+{$WARNINGS OFF}
 procedure TDCP_sha512.Init;
 begin
   Burn;
@@ -366,6 +369,7 @@ begin
   CurrentHash[7]:= $5be0cd19137e2179;
   fInitialized:= true;
 end;
+{$WARNINGS ON}
 
 procedure TDCP_sha512.Final(var Digest);
 begin

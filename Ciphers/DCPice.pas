@@ -47,7 +47,7 @@ type
   protected
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -57,7 +57,7 @@ type
   protected
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -67,7 +67,7 @@ type
   protected
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -318,7 +318,7 @@ begin
   Result:= 64;
 end;
 
-class function TDCP_ice.GetID: integer;
+class function TDCP_ice.GetId: integer;
 begin
   Result:= DCP_ice;
 end;
@@ -359,7 +359,7 @@ begin
   Result:= 64;
 end;
 
-class function TDCP_thinice.GetID: integer;
+class function TDCP_thinice.GetId: integer;
 begin
   Result:= DCP_thinice;
 end;
@@ -400,7 +400,7 @@ begin
   Result:= 128;
 end;
 
-class function TDCP_ice2.GetID: integer;
+class function TDCP_ice2.GetId: integer;
 begin
   Result:= DCP_ice2;
 end;

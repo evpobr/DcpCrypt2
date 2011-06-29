@@ -43,7 +43,7 @@ type
     KeyData: array[0..7] of DWord;
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -64,7 +64,7 @@ begin
   Result:= 256;
 end;
 
-class function TDCP_gost.GetID: integer;
+class function TDCP_gost.GetId: integer;
 begin
   Result:= DCP_gost;
 end;

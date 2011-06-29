@@ -34,7 +34,7 @@ type
     KeyData: array[0..63] of word;
     procedure InitKey(const Key; Size: longword); override;
   public
-    class function GetID: integer; override;
+    class function GetId: integer; override;
     class function GetAlgorithm: string; override;
     class function GetMaxKeySize: integer; override;
     class function SelfTest: boolean; override;
@@ -66,7 +66,7 @@ begin
   Result:= 1024;
 end;
 
-class function TDCP_rc2.GetID: integer;
+class function TDCP_rc2.GetId: integer;
 begin
   Result:= DCP_rc2;
 end;
