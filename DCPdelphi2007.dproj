@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-    <DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Documents\RAD Studio\5.0\Bpl\DCPdelphi2007.bpl</DCC_DependencyCheckOutputName>
+    <DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\5.0\Bpl\DCPdelphi2007.bpl</DCC_DependencyCheckOutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Version>7.0</Version>
@@ -29,6 +29,7 @@
     <DelphiCompile Include="DCPdelphi2007.dpk">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="$(SystemRoot)\system32\rtl.dcp" />
     <DCCReference Include="Ciphers\DCPblowfish.pas" />
     <DCCReference Include="Ciphers\DCPcast128.pas" />
     <DCCReference Include="Ciphers\DCPcast256.pas" />
@@ -60,7 +61,6 @@
     <DCCReference Include="Hashes\DCPsha256.pas" />
     <DCCReference Include="Hashes\DCPsha512.pas" />
     <DCCReference Include="Hashes\DCPtiger.pas" />
-    <DCCReference Include="rtl.dcp" />
   </ItemGroup>
 </Project>
 <!-- EurekaLog First Line

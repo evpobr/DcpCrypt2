@@ -258,36 +258,32 @@ begin
     Result := b;
 end;
 
-procedure TfrmMain.btnEncryptClick(Sender: TObject);
+
+function DoEncryptFile(infile,outfile,passphrase:String;
+                        Hash: TDCP_hash;Cipher: TDCP_cipher):Boolean;
 var
-  Cipher: TDCP_cipher;         // the cipher to use
   CipherIV: array of byte;     // the initialisation vector (for chaining modes)
-  Hash: TDCP_hash;             // the hash to use
   HashDigest: array of byte;   // the result of hashing the passphrase with the salt
   Salt: array[0..7] of byte;   // a random salt to help prevent precomputated attacks
   strmInput, strmOutput: TFileStream;
   i: integer;
 begin
-  if FileExists(boxOutputFile.Text) then
-    if (MessageDlg('Output file already exists. Overwrite?',mtConfirmation,mbYesNoCancel,0) <> mrYes) then
-      Exit;
+  result := true;
   strmInput := nil;
   strmOutput := nil;
   try
-    strmInput := TFileStream.Create(boxInputFile.Text,fmOpenRead);
-    strmOutput := TFileStream.Create(boxOutputFile.Text,fmCreate);
+    strmInput := TFileStream.Create(infile,fmOpenRead);
+    strmOutput := TFileStream.Create(outfile,fmCreate);
 
-    Hash := TDCP_hash(cbxHash.Items.Objects[cbxHash.ItemIndex]);
     SetLength(HashDigest,Hash.HashSize div 8);
     for i := 0 to 7 do
       Salt[i] := Random(256);  // just fill the salt with random values (crypto secure PRNG would be better but not _really_ necessary)
     strmOutput.WriteBuffer(Salt,Sizeof(Salt));  // write out the salt so we can decrypt!
     Hash.Init;
     Hash.Update(Salt[0],Sizeof(Salt));   // hash the salt
-    Hash.UpdateStr(boxPassphrase.Text);  // and the passphrase
+    Hash.UpdateStr(passphrase);  // and the passphrase
     Hash.Final(HashDigest[0]);           // store the output in HashDigest
 
-    Cipher := TDCP_cipher(cbxCipher.Items.Objects[cbxCipher.ItemIndex]);
     if (Cipher is TDCP_blockcipher) then      // if the cipher is a block cipher we need an initialisation vector
     begin
       SetLength(CipherIV,TDCP_blockcipher(Cipher).BlockSize div 8);
@@ -304,42 +300,36 @@ begin
     Cipher.Burn;   // important! get rid of keying information
     strmInput.Free;
     strmOutput.Free;
-    MessageDlg('File encrypted',mtInformation,[mbOK],0);
 
   except
     strmInput.Free;
     strmOutput.Free;
-    MessageDlg('An error occurred while processing the file',mtError,[mbOK],0);
+    result := false;
   end;
 end;
 
-procedure TfrmMain.btnDecryptClick(Sender: TObject);
+function DoDecryptFile(infile,outfile,passphrase:String;
+                        Hash: TDCP_hash;Cipher: TDCP_cipher):Boolean;
 var
-  Cipher: TDCP_cipher;         // the cipher to use
   CipherIV: array of byte;     // the initialisation vector (for chaining modes)
-  Hash: TDCP_hash;             // the hash to use
   HashDigest: array of byte;   // the result of hashing the passphrase with the salt
   Salt: array[0..7] of byte;   // a random salt to help prevent precomputated attacks
   strmInput, strmOutput: TFileStream;
 begin
-  if FileExists(boxOutputFile.Text) then
-    if (MessageDlg('Output file already exists. Overwrite?',mtConfirmation,mbYesNoCancel,0) <> mrYes) then
-      Exit;
+
   strmInput := nil;
   strmOutput := nil;
   try
-    strmInput := TFileStream.Create(boxInputFile.Text,fmOpenRead);
-    strmOutput := TFileStream.Create(boxOutputFile.Text,fmCreate);
+    strmInput := TFileStream.Create(infile,fmOpenRead);
+    strmOutput := TFileStream.Create(outfile,fmCreate);
 
-    Hash := TDCP_hash(cbxHash.Items.Objects[cbxHash.ItemIndex]);
     SetLength(HashDigest,Hash.HashSize div 8);
     strmInput.ReadBuffer(Salt[0],Sizeof(Salt));  // read the salt in from the file
     Hash.Init;
     Hash.Update(Salt[0],Sizeof(Salt));   // hash the salt
-    Hash.UpdateStr(boxPassphrase.Text);  // and the passphrase
+    Hash.UpdateStr(passphrase);  // and the passphrase
     Hash.Final(HashDigest[0]);           // store the hash in HashDigest
 
-    Cipher := TDCP_cipher(cbxCipher.Items.Objects[cbxCipher.ItemIndex]);
     if (Cipher is TDCP_blockcipher) then            // if it is a block cipher we need the IV
     begin
       SetLength(CipherIV,TDCP_blockcipher(Cipher).BlockSize div 8);
@@ -354,14 +344,67 @@ begin
     Cipher.Burn;
     strmInput.Free;
     strmOutput.Free;
-    MessageDlg('File decrypted',mtInformation,[mbOK],0);
 
   except
     strmInput.Free;
     strmOutput.Free;
-    MessageDlg('An error occurred while processing the file',mtError,[mbOK],0);
   end;
 end;
+
+
+procedure TfrmMain.btnEncryptClick(Sender: TObject);
+var
+  Hash: TDCP_hash;             // the hash to use
+  Cipher: TDCP_cipher;         // the cipher to use
+begin
+  if FileExists(boxOutputFile.Text) then
+    if (MessageDlg('Output file already exists. Overwrite?',mtConfirmation,mbYesNoCancel,0) <> mrYes) then
+      Exit;
+
+  Hash := TDCP_hash(cbxHash.Items.Objects[cbxHash.ItemIndex]);
+  Cipher := TDCP_cipher(cbxCipher.Items.Objects[cbxCipher.ItemIndex]);
+
+  if not DoEncryptFile( boxInputFile.Text,
+                        boxOutputFile.Text,
+                        boxPassphrase.Text,
+                        hash,
+                        cipher ) then begin
+      MessageDlg('An error occurred while processing the file',mtError,[mbOK],0);
+  end else begin
+      MessageDlg('File encrypted',mtInformation,[mbOK],0);
+  end;
+
+end;
+
+procedure TfrmMain.btnDecryptClick(Sender: TObject);
+var
+  Cipher: TDCP_cipher;         // the cipher to use
+  Hash: TDCP_hash;             // the hash to use
+begin
+  if FileExists(boxOutputFile.Text) then
+    if (MessageDlg('Output file already exists. Overwrite?',mtConfirmation,mbYesNoCancel,0) <> mrYes) then
+      Exit;
+
+  Hash := TDCP_hash(cbxHash.Items.Objects[cbxHash.ItemIndex]);
+  Cipher := TDCP_cipher(cbxCipher.Items.Objects[cbxCipher.ItemIndex]);
+
+  if not DoDecryptFile( boxInputFile.Text,
+                        boxOutputFile.Text,
+                        boxPassphrase.Text,
+                        hash,
+                        cipher ) then begin
+
+    MessageDlg('An error occurred while processing the file',mtError,[mbOK],0);
+
+
+  end else begin
+     MessageDlg('File decrypted',mtInformation,[mbOK],0);
+
+  end;
+
+end;
+
+
 
 procedure TfrmMain.btnCloseClick(Sender: TObject);
 begin

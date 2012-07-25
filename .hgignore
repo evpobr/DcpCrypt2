@@ -5,3 +5,5 @@ glob:*.dsk
 glob:*.identcache
 glob:*.~*
 glob:*.2007
+syntax: glob
+*.exe
