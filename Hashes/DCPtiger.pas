@@ -59,6 +59,7 @@ var
   a, b, c, aa, bb, cc: int64;
   x: array[0..7] of int64;
 begin
+  FillChar(x, SizeOf(x), 0);
   a:= CurrentHash[0]; aa:= a;
   b:= CurrentHash[1]; bb:= b;
   c:= CurrentHash[2]; cc:= c;
@@ -217,24 +218,23 @@ begin
 end;
 
 class function TDCP_tiger.SelfTest: boolean;
-{$WARNINGS OFF}
 const
   Test1Out: array[0..2] of int64=
     ($87FB2A9083851CF7,$470D2CF810E6DF9E,$B586445034A5A386);
   Test2Out: array[0..2] of int64=
     ($0C410A042968868A,$1671DA5A3FD29A72,$5EC1E457D3CDB303);
-{$WARNINGS ON}
 var
   TestHash: TDCP_tiger;
   TestOut: array[0..2] of int64;
 begin
+  FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TDCP_tiger.Create(nil);
   TestHash.Init;
-  TestHash.UpdateStr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-');
+  TestHash.UpdateStr(AnsiString('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
   TestHash.Init;
-  TestHash.UpdateStr('Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham');
+  TestHash.UpdateStr(AnsiString('Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out)) and Result;
   TestHash.Free;
@@ -244,11 +244,9 @@ procedure TDCP_tiger.Init;
 begin
   Burn;
   fInitialized:= true;
-  {$WARNINGS OFF}
   CurrentHash[0]:= $0123456789ABCDEF;
   CurrentHash[1]:= $FEDCBA9876543210;
   CurrentHash[2]:= $F096A5B4C3B2E187;
-  {$WARNINGS ON}
 end;
 
 procedure TDCP_tiger.Burn;

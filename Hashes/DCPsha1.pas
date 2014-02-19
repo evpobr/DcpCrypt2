@@ -64,6 +64,7 @@ var
   i: longword;
 begin
   Index:= 0;
+  FillChar(W, SizeOf(W), 0);
   Move(HashBuffer,W,Sizeof(HashBuffer));
   for i:= 0 to 15 do
     W[i]:= SwapDWord(W[i]);
@@ -169,7 +170,7 @@ begin
   Result:= 'SHA1';
 end;
 
-class function TDCP_sha1.GetId: integer;
+class function TDCP_sha1.GetID: integer;
 begin
   Result:= DCP_sha1;
 end;
@@ -189,13 +190,14 @@ var
   TestHash: TDCP_sha1;
   TestOut: array[0..19] of byte;
 begin
+  FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TDCP_sha1.Create(nil);
   TestHash.Init;
-  TestHash.UpdateStr('abc');
+  TestHash.UpdateStr(AnsiString('abc'));
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out)));
   TestHash.Init;
-  TestHash.UpdateStr('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq');
+  TestHash.UpdateStr(AnsiString('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'));
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out))) and Result;
   TestHash.Free;

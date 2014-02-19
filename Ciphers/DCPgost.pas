@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of Gost *********************************}
 {******************************************************************************}
@@ -33,6 +33,8 @@
 {******************************************************************************}
 unit DCPgost;
 
+{$INCLUDE '..\dcp.inc'}
+
 interface
 uses
   Classes, Sysutils, DCPcrypt2, DCPconst, DCPblockciphers;
@@ -59,12 +61,16 @@ implementation
 {$R-}{$Q-}
 {$I DCPgost.inc}
 
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
 class function TDCP_gost.GetMaxKeySize: integer;
 begin
   Result:= 256;
 end;
 
-class function TDCP_gost.GetId: integer;
+class function TDCP_gost.GetID: integer;
 begin
   Result:= DCP_gost;
 end;
@@ -94,6 +100,7 @@ var
   Block: array[0..7] of byte;
   Cipher: TDCP_gost;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_gost.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Block);
@@ -116,7 +123,6 @@ var
   userkey: array[0..31] of byte;
 begin
   Size:= Size div 8;
-
   FillChar(userkey,Sizeof(userkey),0);
   Move(Key,userkey,Size);
   for i:= 0 to 7 do
@@ -138,7 +144,7 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   n1:= PDword(@InData)^;
-  n2:= PDword(dword(@InData)+4)^;
+  n2:= PDword(PointerToInt(@InData)+4)^;
   for i:= 0 to 2 do
   begin
     n2:= n2 xor (sTable[3,(n1+KeyData[0]) shr 24] xor sTable[2,((n1+KeyData[0]) shr 16) and $FF]
@@ -175,7 +181,7 @@ begin
   n1:= n1 xor (sTable[3,(n2+KeyData[0]) shr 24] xor sTable[2,((n2+KeyData[0]) shr 16) and $FF]
     xor sTable[1,((n2+KeyData[0]) shr 8) and $FF] xor sTable[0,(n2+KeyData[0]) and $FF]);
   PDword(@OutData)^:= n2;
-  PDword(dword(@OutData)+4)^:= n1;
+  PDword(PointerToInt(@OutData)+4)^:= n1;
 end;
 
 procedure TDCP_gost.DecryptECB(const InData; var OutData);
@@ -186,7 +192,7 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   n1:= PDword(@InData)^;
-  n2:= PDword(dword(@InData)+4)^;
+  n2:= PDword(PointerToInt(@InData)+4)^;
   n2:= n2 xor (sTable[3,(n1+KeyData[0]) shr 24] xor sTable[2,((n1+KeyData[0]) shr 16) and $FF]
     xor sTable[1,((n1+KeyData[0]) shr 8) and $FF] xor sTable[0,(n1+KeyData[0]) and $FF]);
   n1:= n1 xor (sTable[3,(n2+KeyData[1]) shr 24] xor sTable[2,((n2+KeyData[1]) shr 16) and $FF]
@@ -223,7 +229,7 @@ begin
       xor sTable[1,((n2+KeyData[0]) shr 8) and $FF] xor sTable[0,(n2+KeyData[0]) and $FF]);
   end;
   PDword(@OutData)^:= n2;
-  PDword(dword(@OutData)+4)^:= n1;
+  PDword(PointerToInt(@OutData)+4)^:= n1;
 end;
 
 

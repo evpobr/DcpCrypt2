@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of Ice and it's variants ****************}
 {******************************************************************************}
@@ -23,6 +23,8 @@
 {* DEALINGS IN THE SOFTWARE.                                                  *}
 {******************************************************************************}
 unit DCPice;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -77,6 +79,10 @@ type
 {******************************************************************************}
 implementation
 {$R-}{$Q-}
+
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
 
 var
   ice_sbox: array[0..3,0..1023] of dword;
@@ -240,7 +246,7 @@ begin
 
   if rounds= 8 then
   begin
-    for i:= 0 to 4 do
+    for i:= 0 to 3 do // Adrien Reboisson - was "for i:= 0 to 4 do"
       kb[3 - i]:= (keyb[i*2] shl 8) or keyb[i*2 + 1];
     key_sched_build(@kb,0,@ice_keyrot);
   end
@@ -270,7 +276,7 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   l:= SwapDWord(Pdword(@InData)^);
-  r:= SwapDWord(Pdword(longword(@InData)+4)^);
+  r:= SwapDWord(Pdword(PointerToInt(@InData)+4)^);
   i:= 0;
   while i< rounds do
   begin
@@ -279,7 +285,7 @@ begin
     Inc(i,2);
   end;
   Pdword(@OutData)^:= SwapDWord(r);
-  Pdword(longword(@OutData)+4)^:= SwapDWord(l);
+  Pdword(PointerToInt(@OutData)+4)^:= SwapDWord(l);
 end;
 
 procedure TDCP_customice.DecryptECB(const InData; var OutData);
@@ -290,7 +296,7 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   l:= SwapDWord(Pdword(@InData)^);
-  r:= SwapDWord(Pdword(longword(@InData)+4)^);
+  r:= SwapDWord(Pdword(PointerToInt(@InData)+4)^);
   i:= rounds-1;
   while i> 0 do
   begin
@@ -299,7 +305,7 @@ begin
     Dec(i,2);
   end;
   Pdword(@OutData)^:= SwapDWord(r);
-  Pdword(longword(@OutData)+4)^:= SwapDWord(l);
+  Pdword(PointerToInt(@OutData)+4)^:= SwapDWord(l);
 end;
 
 constructor TDCP_customice.Create(AOwner: TComponent);
@@ -318,7 +324,7 @@ begin
   Result:= 64;
 end;
 
-class function TDCP_ice.GetId: integer;
+class function TDCP_ice.GetID: integer;
 begin
   Result:= DCP_ice;
 end;
@@ -337,6 +343,7 @@ var
   Cipher: TDCP_ice;
   Data: array[0..7] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_ice.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Data);
@@ -359,7 +366,7 @@ begin
   Result:= 64;
 end;
 
-class function TDCP_thinice.GetId: integer;
+class function TDCP_thinice.GetID: integer;
 begin
   Result:= DCP_thinice;
 end;
@@ -378,6 +385,7 @@ var
   Cipher: TDCP_thinice;
   Data: array[0..7] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_thinice.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Data);
@@ -400,7 +408,7 @@ begin
   Result:= 128;
 end;
 
-class function TDCP_ice2.GetId: integer;
+class function TDCP_ice2.GetID: integer;
 begin
   Result:= DCP_ice2;
 end;
@@ -420,6 +428,7 @@ var
   Cipher: TDCP_ice2;
   Data: array[0..7] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_ice2.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Data);

@@ -50,7 +50,7 @@ implementation
 {$R-}{$Q-}
 
 const
-  Delta= $9e3779b9;
+  Delta: DWord = $9e3779b9;
   Rounds= 32;
 
 function SwapDword(a: dword): dword;
@@ -58,7 +58,7 @@ begin
   Result:= ((a and $FF) shl 24) or ((a and $FF00) shl 8) or ((a and $FF0000) shr 8) or ((a and $FF000000) shr 24);
 end;
 
-class function TDCP_tea.GetId: integer;
+class function TDCP_tea.GetID: integer;
 begin
   Result:= DCP_tea;
 end;
@@ -81,6 +81,7 @@ var
   Data: array[0..1] of dword;
   Cipher: TDCP_tea;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_tea.Create(nil);
   Cipher.Init(Key,Sizeof(Key)*8,nil);
   Cipher.EncryptECB(PT,Data);
@@ -134,7 +135,11 @@ begin
 
   x:= SwapDWord(pdword(@InData)^);
   y:= SwapDWord(pdword(longword(@InData)+4)^);
-  sum:= Delta shl 5; a:= KeyData[0]; b:= KeyData[1]; c:= KeyData[2]; d:= KeyData[3];
+  sum:= Delta shl 5;
+  a:= KeyData[0];
+  b:= KeyData[1];
+  c:= KeyData[2];
+  d:= KeyData[3];
   for n:= 1 to Rounds do
   begin
     Dec(y,(x shl 4) + (c xor x) + (sum xor (x shr 5)) + d);

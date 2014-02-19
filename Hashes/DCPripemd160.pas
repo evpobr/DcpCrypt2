@@ -59,6 +59,7 @@ var
   aa, bb, cc, dd, ee, aaa, bbb, ccc, ddd, eee: DWord;
   X: array[0..15] of DWord;
 begin
+  FillChar(X, SizeOf(X), 0);
   Move(HashBuffer,X,Sizeof(X));
   aa:= CurrentHash[0];
   aaa:= CurrentHash[0];
@@ -597,13 +598,14 @@ var
   TestHash: TDCP_ripemd160;
   TestOut: array[0..19] of byte;
 begin
+  FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TDCP_ripemd160.Create(nil);
   TestHash.Init;
-  TestHash.UpdateStr('a');
+  TestHash.UpdateStr(AnsiString('a'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
   TestHash.Init;
-  TestHash.UpdateStr('abcdefghijklmnopqrstuvwxyz');
+  TestHash.UpdateStr(AnsiString('abcdefghijklmnopqrstuvwxyz'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out)) and Result;
   TestHash.Free;

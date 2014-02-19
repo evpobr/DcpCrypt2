@@ -62,7 +62,7 @@ begin
   Result:= 128;
 end;
 
-class function TDCP_cast128.GetId: integer;
+class function TDCP_cast128.GetID: integer;
 begin
   Result:= DCP_cast128;
 end;
@@ -88,6 +88,7 @@ var
   Block: array[0..7] of byte;
   Cipher: TDCP_cast128;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_cast128.Create(nil);
   Cipher.Init(Key,128,nil);
   Cipher.EncryptECB(InBlock,Block);
@@ -120,7 +121,7 @@ begin
     Rounds:= 12
   else
     Rounds:= 16;
-  FillChar(x,Sizeof(x),0);
+  FillChar(x, Sizeof(x), 0);
   Move(Key,x,Size);
   x[0]:= (x[0] shr 24) or ((x[0] shr 8) and $FF00) or ((x[0] shl 8) and $FF0000) or (x[0] shl 24);
   x[1]:= (x[1] shr 24) or ((x[1] shr 8) and $FF00) or ((x[1] shl 8) and $FF0000) or (x[1] shl 24);

@@ -64,6 +64,7 @@ var
   Data: array[0..15] of dword;
   A, B, C, D: dword;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Move(HashBuffer,Data,Sizeof(Data));
   A:= CurrentHash[0];
   B:= CurrentHash[1];
@@ -171,13 +172,14 @@ var
   TestHash: TDCP_md5;
   TestOut: array[0..19] of byte;
 begin
+  FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TDCP_md5.Create(nil);
   TestHash.Init;
-  TestHash.UpdateStr('abc');
+  TestHash.UpdateStr(AnsiString('abc'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
   TestHash.Init;
-  TestHash.UpdateStr('abcdefghijklmnopqrstuvwxyz');
+  TestHash.UpdateStr(AnsiString('abcdefghijklmnopqrstuvwxyz'));
   TestHash.Final(TestOut);
   Result:= CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out)) and Result;
   TestHash.Free;

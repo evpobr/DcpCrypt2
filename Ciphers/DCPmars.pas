@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of Mars *********************************}
 {******************************************************************************}
@@ -23,6 +23,8 @@
 {* DEALINGS IN THE SOFTWARE.                                                  *}
 {******************************************************************************}
 unit DCPmars;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -50,6 +52,10 @@ implementation
 {$R-}{$Q-}
 {$I DCPmars.inc}
 
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
 function LRot32(X: DWord; c: longword): DWord;
 begin
   LRot32:= (X shl c) or (X shr (32 - c));
@@ -60,7 +66,7 @@ begin
   RRot32:= (X shr c) or (X shl (32 - c));
 end;
 
-class function TDCP_mars.GetId: integer;
+class function TDCP_mars.GetID: integer;
 begin
   Result:= DCP_mars;
 end;
@@ -93,6 +99,7 @@ var
   Cipher: TDCP_mars;
   Block: array[0..3] of dword;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_mars.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(Plain1,Block);
@@ -138,8 +145,11 @@ var
   t: array[-7..39] of DWord;
   KeyB: array[0..39] of DWord;
 begin
+  m := 0;
   Size:= Size div 8;
   FillChar(KeyB,Sizeof(KeyB),0);
+  FillChar(t, SizeOf(t), 0);
+
   Move(Key,KeyB,Size);
   Size:= Size div 4;
   Move(vk,t,Sizeof(vk));
@@ -186,9 +196,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   Blk[0]:= PDWord(@InData)^;
-  Blk[1]:= PDWord(longword(@InData)+4)^;
-  Blk[2]:= PDWord(longword(@InData)+8)^;
-  Blk[3]:= PDWord(longword(@InData)+12)^;
+  Blk[1]:= PDWord(PointerToInt(@InData)+4)^;
+  Blk[2]:= PDWord(PointerToInt(@InData)+8)^;
+  Blk[3]:= PDWord(PointerToInt(@InData)+12)^;
 
   blk[0]:= blk[0] + KeyData[0]; blk[1]:= blk[1] + KeyData[1];
   blk[2]:= blk[2] + KeyData[2]; blk[3]:= blk[3] + KeyData[3];
@@ -436,9 +446,9 @@ begin
   blk[2]:= blk[2] - KeyData[38]; blk[3]:= blk[3] - KeyData[39];
 
   PDWord(@OutData)^:= Blk[0];
-  PDWord(longword(@OutData)+4)^:= Blk[1];
-  PDWord(longword(@OutData)+8)^:= Blk[2];
-  PDWord(longword(@OutData)+12)^:= Blk[3];
+  PDWord(PointerToInt(@OutData)+4)^:= Blk[1];
+  PDWord(PointerToInt(@OutData)+8)^:= Blk[2];
+  PDWord(PointerToInt(@OutData)+12)^:= Blk[3];
 end;
 
 procedure TDCP_mars.DecryptECB(const InData; var OutData);
@@ -449,9 +459,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   Blk[0]:= PDWord(@InData)^;
-  Blk[1]:= PDWord(longword(@InData)+4)^;
-  Blk[2]:= PDWord(longword(@InData)+8)^;
-  Blk[3]:= PDWord(longword(@InData)+12)^;
+  Blk[1]:= PDWord(PointerToInt(@InData)+4)^;
+  Blk[2]:= PDWord(PointerToInt(@InData)+8)^;
+  Blk[3]:= PDWord(PointerToInt(@InData)+12)^;
 
   blk[0]:= blk[0] + KeyData[36]; blk[1]:= blk[1] + KeyData[37];
   blk[2]:= blk[2] + KeyData[38]; blk[3]:= blk[3] + KeyData[39];
@@ -699,9 +709,9 @@ begin
   blk[2]:= blk[2] - KeyData[2]; blk[3]:= blk[3] - KeyData[3];
 
   PDWord(@OutData)^:= Blk[0];
-  PDWord(longword(@OutData)+4)^:= Blk[1];
-  PDWord(longword(@OutData)+8)^:= Blk[2];
-  PDWord(longword(@OutData)+12)^:= Blk[3];
+  PDWord(PointerToInt(@OutData)+4)^:= Blk[1];
+  PDWord(PointerToInt(@OutData)+8)^:= Blk[2];
+  PDWord(PointerToInt(@OutData)+12)^:= Blk[3];
 end;
 
 end.

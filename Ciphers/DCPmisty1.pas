@@ -63,7 +63,7 @@ begin
   Result:= ((a and $FF) shl 24) or ((a and $FF00) shl 8) or ((a and $FF0000) shr 8) or ((a and $FF000000) shr 24);
 end;
 
-class function TDCP_misty1.GetId: integer;
+class function TDCP_misty1.GetID: integer;
 begin
   Result:= DCP_misty1;
 end;
@@ -90,6 +90,7 @@ var
   Cipher: TDCP_misty1;
   Block: array[0..7] of byte;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_misty1.Create(nil);
   Cipher.Init(Key,Sizeof(Key)*8,nil);
   Cipher.EncryptECB(Plain1,Block);

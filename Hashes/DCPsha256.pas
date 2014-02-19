@@ -64,6 +64,7 @@ var
   i: longword;
 begin
   Index:= 0;
+  FillChar(W, SizeOf(W), 0);
   a:= CurrentHash[0]; b:= CurrentHash[1]; c:= CurrentHash[2]; d:= CurrentHash[3];
   e:= CurrentHash[4]; f:= CurrentHash[5]; g:= CurrentHash[6]; h:= CurrentHash[7];
   Move(HashBuffer,W,Sizeof(HashBuffer));
@@ -189,13 +190,14 @@ var
   TestHash: TDCP_sha256;
   TestOut: array[0..31] of byte;
 begin
+  FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TDCP_sha256.Create(nil);
   TestHash.Init;
-  TestHash.UpdateStr('abc');
+  TestHash.UpdateStr(AnsiString('abc'));
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out)));
   TestHash.Init;
-  TestHash.UpdateStr('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq');
+  TestHash.UpdateStr(AnsiString('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'));
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out))) and Result;
   TestHash.Free;

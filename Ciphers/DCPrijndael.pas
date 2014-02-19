@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of Rijndael *****************************}
 {******************************************************************************}
@@ -23,6 +23,8 @@
 {* DEALINGS IN THE SOFTWARE.                                                  *}
 {******************************************************************************}
 unit DCPrijndael;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -55,12 +57,16 @@ implementation
 {$R-}{$Q-}
 {$I DCPrijndael.inc}
 
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
 class function TDCP_rijndael.GetMaxKeySize: integer;
 begin
   Result:= 256;
 end;
 
-class function TDCP_rijndael.GetId: integer;
+class function TDCP_rijndael.GetID: integer;
 begin
   Result:= DCP_rijndael;
 end;
@@ -96,6 +102,7 @@ var
   Block: array[0..15] of byte;
   Cipher: TDCP_rijndael;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_rijndael.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Block);
@@ -234,9 +241,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   PDword(@a[0,0])^:= PDword(@InData)^;
-  PDword(@a[1,0])^:= PDword(dword(@InData)+4)^;
-  PDword(@a[2,0])^:= PDword(dword(@InData)+8)^;
-  PDword(@a[3,0])^:= PDword(dword(@InData)+12)^;
+  PDword(@a[1,0])^:= PDword(PointerToInt(@InData)+4)^;
+  PDword(@a[2,0])^:= PDword(PointerToInt(@InData)+8)^;
+  PDword(@a[3,0])^:= PDword(PointerToInt(@InData)+12)^;
   for r:= 0 to (numrounds-2) do
   begin
     PDWord(@tempb[0])^:= PDWord(@a[0])^ xor rk[r,0];
@@ -286,9 +293,9 @@ begin
   PDWord(@a[3])^:= PDWord(@a[3])^ xor rk[numrounds,3];
 
   PDword(@OutData)^:= PDword(@a[0,0])^;
-  PDword(dword(@OutData)+4)^:= PDword(@a[1,0])^;
-  PDword(dword(@OutData)+8)^:= PDword(@a[2,0])^;
-  PDword(dword(@OutData)+12)^:= PDword(@a[3,0])^;
+  PDword(PointerToInt(@OutData)+4)^:= PDword(@a[1,0])^;
+  PDword(PointerToInt(@OutData)+8)^:= PDword(@a[2,0])^;
+  PDword(PointerToInt(@OutData)+12)^:= PDword(@a[3,0])^;
 end;
 
 procedure TDCP_rijndael.DecryptECB(const InData; var OutData);
@@ -300,9 +307,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   PDword(@a[0,0])^:= PDword(@InData)^;
-  PDword(@a[1,0])^:= PDword(dword(@InData)+4)^;
-  PDword(@a[2,0])^:= PDword(dword(@InData)+8)^;
-  PDword(@a[3,0])^:= PDword(dword(@InData)+12)^;
+  PDword(@a[1,0])^:= PDword(PointerToInt(@InData)+4)^;
+  PDword(@a[2,0])^:= PDword(PointerToInt(@InData)+8)^;
+  PDword(@a[3,0])^:= PDword(PointerToInt(@InData)+12)^;
   for r:= NumRounds downto 2 do
   begin
     PDWord(@tempb[0])^:= PDWord(@a[0])^ xor drk[r,0];
@@ -351,9 +358,9 @@ begin
   PDWord(@a[2])^:= PDWord(@a[2])^ xor drk[0,2];
   PDWord(@a[3])^:= PDWord(@a[3])^ xor drk[0,3];
   PDword(@OutData)^:= PDword(@a[0,0])^;
-  PDword(dword(@OutData)+4)^:= PDword(@a[1,0])^;
-  PDword(dword(@OutData)+8)^:= PDword(@a[2,0])^;
-  PDword(dword(@OutData)+12)^:= PDword(@a[3,0])^;
+  PDword(PointerToInt(@OutData)+4)^:= PDword(@a[1,0])^;
+  PDword(PointerToInt(@OutData)+8)^:= PDword(@a[2,0])^;
+  PDword(PointerToInt(@OutData)+12)^:= PDword(@a[3,0])^;
 end;
 
 

@@ -73,6 +73,7 @@ var
   W: array[0..31] of DWord;
   Temp: dword;
 begin
+  FillChar(W, SizeOf(W), 0);
   t0:= CurrentHash[0];
   t1:= CurrentHash[1];
   t2:= CurrentHash[2];
@@ -175,7 +176,7 @@ class function TDCP_haval.SelfTest: boolean;
     begin
       TestHash:= TDCP_haval.Create(nil);
       TestHash.Init;
-      TestHash.UpdateStr('');
+      TestHash.UpdateStr(AnsiString(''));
       TestHash.Final(TestOut);
       Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
       TestHash.Free;
@@ -191,7 +192,7 @@ class function TDCP_haval.SelfTest: boolean;
       begin
         TestHash:= TDCP_haval.Create(nil);
         TestHash.Init;
-        TestHash.UpdateStr('a');
+        TestHash.UpdateStr(AnsiString('a'));
         TestHash.Final(TestOut);
         Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
         TestHash.Free;
@@ -213,7 +214,7 @@ class function TDCP_haval.SelfTest: boolean;
       begin
         TestHash:= TDCP_haval.Create(nil);
         TestHash.Init;
-        TestHash.UpdateStr('HAVAL');
+        TestHash.UpdateStr(AnsiString('HAVAL'));
         TestHash.Final(TestOut);
         Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
         TestHash.Free;
@@ -229,7 +230,7 @@ class function TDCP_haval.SelfTest: boolean;
         begin
           TestHash:= TDCP_haval.Create(nil);
           TestHash.Init;
-          TestHash.UpdateStr('0123456789');
+          TestHash.UpdateStr(AnsiString('0123456789'));
           TestHash.Final(TestOut);
           Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
           TestHash.Free;
@@ -251,13 +252,14 @@ class function TDCP_haval.SelfTest: boolean;
         TestHash: TDCP_haval;
         TestOut: array[0..31] of byte;
       begin
+        FillChar(TestOut, SizeOf(TestOut), 0);
         TestHash:= TDCP_haval.Create(nil);
         TestHash.Init;
-        TestHash.UpdateStr('abcdefghijklmnopqrstuvwxyz');
+        TestHash.UpdateStr(AnsiString('abcdefghijklmnopqrstuvwxyz'));
         TestHash.Final(TestOut);
         Result:= CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out));
         TestHash.Init;
-        TestHash.UpdateStr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789');
+        TestHash.UpdateStr(AnsiString('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'));
         TestHash.Final(TestOut);
         Result:= CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out)) and Result;
         TestHash.Free;

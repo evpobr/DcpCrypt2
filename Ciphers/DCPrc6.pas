@@ -109,6 +109,7 @@ var
   Cipher: TDCP_rc6;
   Data: array[0..15] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_rc6.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(Plain1,Data);

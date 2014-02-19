@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of RC4 **********************************}
 {******************************************************************************}
@@ -23,6 +23,8 @@
 {* DEALINGS IN THE SOFTWARE.                                                  *}
 {******************************************************************************}
 unit DCPrc4;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -49,7 +51,11 @@ type
 implementation
 {$R-}{$Q-}
 
-class function TDCP_rc4.GetId: integer;
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
+class function TDCP_rc4.GetID: integer;
 begin
   Result:= DCP_rc4;
 end;
@@ -73,6 +79,7 @@ var
   Cipher: TDCP_rc4;
   Data: array[0..4] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_rc4.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.Encrypt(InData1,Data,Sizeof(Data));
@@ -97,21 +104,21 @@ begin
   while i< 255 do
   begin
     KeyData[i]:= i;
-    xKey[i]:= PByte(longword(@Key)+(i mod Size))^;
+    xKey[i]:= PByte(PointerToInt(@Key)+(i mod Size))^;
     KeyData[i+1]:= i+1;
-    xKey[i+1]:= PByte(longword(@Key)+((i+1) mod Size))^;
+    xKey[i+1]:= PByte(PointerToInt(@Key)+((i+1) mod Size))^;
     KeyData[i+2]:= i+2;
-    xKey[i+2]:= PByte(longword(@Key)+((i+2) mod Size))^;
+    xKey[i+2]:= PByte(PointerToInt(@Key)+((i+2) mod Size))^;
     KeyData[i+3]:= i+3;
-    xKey[i+3]:= PByte(longword(@Key)+((i+3) mod Size))^;
+    xKey[i+3]:= PByte(PointerToInt(@Key)+((i+3) mod Size))^;
     KeyData[i+4]:= i+4;
-    xKey[i+4]:= PByte(longword(@Key)+((i+4) mod Size))^;
+    xKey[i+4]:= PByte(PointerToInt(@Key)+((i+4) mod Size))^;
     KeyData[i+5]:= i+5;
-    xKey[i+5]:= PByte(longword(@Key)+((i+5) mod Size))^;
+    xKey[i+5]:= PByte(PointerToInt(@Key)+((i+5) mod Size))^;
     KeyData[i+6]:= i+6;
-    xKey[i+6]:= PByte(longword(@Key)+((i+6) mod Size))^;
+    xKey[i+6]:= PByte(PointerToInt(@Key)+((i+6) mod Size))^;
     KeyData[i+7]:= i+7;
-    xKey[i+7]:= PByte(longword(@Key)+((i+7) mod Size))^;
+    xKey[i+7]:= PByte(PointerToInt(@Key)+((i+7) mod Size))^;
     Inc(i,8);
   end;
   j:= 0;

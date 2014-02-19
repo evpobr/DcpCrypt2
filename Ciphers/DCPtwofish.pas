@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of Twofish ******************************}
 {******************************************************************************}
@@ -23,6 +23,8 @@
 {* DEALINGS IN THE SOFTWARE.                                                  *}
 {******************************************************************************}
 unit DCPtwofish;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -64,11 +66,15 @@ implementation
 {$R-}{$Q-}
 {$I DCPtwofish.inc}
 
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
 var
   MDS: array[0..3,0..255] of dword;
   MDSDone: boolean;
 
-class function TDCP_twofish.GetId: integer;
+class function TDCP_twofish.GetID: integer;
 begin
   Result:= DCP_twofish;
 end;
@@ -455,9 +461,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   x[0]:= PDWord(@InData)^ xor SubKeys[INPUTWHITEN];
-  x[1]:= PDWord(longword(@InData)+4)^ xor SubKeys[INPUTWHITEN+1];
-  x[2]:= PDWord(longword(@InData)+8)^ xor SubKeys[INPUTWHITEN+2];
-  x[3]:= PDWord(longword(@InData)+12)^ xor SubKeys[INPUTWHITEN+3];
+  x[1]:= PDWord(PointerToInt(@InData)+4)^ xor SubKeys[INPUTWHITEN+1];
+  x[2]:= PDWord(PointerToInt(@InData)+8)^ xor SubKeys[INPUTWHITEN+2];
+  x[3]:= PDWord(PointerToInt(@InData)+12)^ xor SubKeys[INPUTWHITEN+3];
   i:= 0;
   while i<= NUMROUNDS-2 do
   begin
@@ -480,10 +486,10 @@ begin
     x[0]:= (x[0] shr 1) or (x[0] shl 31);
     Inc(i,2);
   end;
-  PDWord(longword(@OutData)+ 0)^:= x[2] xor SubKeys[OUTPUTWHITEN];
-  PDWord(longword(@OutData)+ 4)^:= x[3] xor SubKeys[OUTPUTWHITEN+1];
-  PDWord(longword(@OutData)+ 8)^:= x[0] xor SubKeys[OUTPUTWHITEN+2];
-  PDWord(longword(@OutData)+12)^:= x[1] xor SubKeys[OUTPUTWHITEN+3];
+  PDWord(PointerToInt(@OutData)+ 0)^:= x[2] xor SubKeys[OUTPUTWHITEN];
+  PDWord(PointerToInt(@OutData)+ 4)^:= x[3] xor SubKeys[OUTPUTWHITEN+1];
+  PDWord(PointerToInt(@OutData)+ 8)^:= x[0] xor SubKeys[OUTPUTWHITEN+2];
+  PDWord(PointerToInt(@OutData)+12)^:= x[1] xor SubKeys[OUTPUTWHITEN+3];
 end;
 
 procedure TDCP_twofish.DecryptECB(const InData; var OutData);
@@ -495,9 +501,9 @@ begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   X[2]:= PDWord(@InData)^ xor SubKeys[OUTPUTWHITEN];
-  X[3]:= PDWord(longword(@InData)+4)^ xor SubKeys[OUTPUTWHITEN+1];
-  X[0]:= PDWord(longword(@InData)+8)^ xor SubKeys[OUTPUTWHITEN+2];
-  X[1]:= PDWord(longword(@InData)+12)^ xor SubKeys[OUTPUTWHITEN+3];
+  X[3]:= PDWord(PointerToInt(@InData)+4)^ xor SubKeys[OUTPUTWHITEN+1];
+  X[0]:= PDWord(PointerToInt(@InData)+8)^ xor SubKeys[OUTPUTWHITEN+2];
+  X[1]:= PDWord(PointerToInt(@InData)+12)^ xor SubKeys[OUTPUTWHITEN+3];
   i:= NUMROUNDS-2;
   while i>= 0 do
   begin
@@ -520,10 +526,10 @@ begin
     x[3]:= (x[3] shr 1) or (x[3] shl 31);
     Dec(i,2);
   end;
-  PDWord(longword(@OutData)+ 0)^:= X[0] xor SubKeys[INPUTWHITEN];
-  PDWord(longword(@OutData)+ 4)^:= X[1] xor SubKeys[INPUTWHITEN+1];
-  PDWord(longword(@OutData)+ 8)^:= X[2] xor SubKeys[INPUTWHITEN+2];
-  PDWord(longword(@OutData)+12)^:= X[3] xor SubKeys[INPUTWHITEN+3];
+  PDWord(PointerToInt(@OutData)+ 0)^:= X[0] xor SubKeys[INPUTWHITEN];
+  PDWord(PointerToInt(@OutData)+ 4)^:= X[1] xor SubKeys[INPUTWHITEN+1];
+  PDWord(PointerToInt(@OutData)+ 8)^:= X[2] xor SubKeys[INPUTWHITEN+2];
+  PDWord(PointerToInt(@OutData)+12)^:= X[3] xor SubKeys[INPUTWHITEN+3];
 end;
 
 procedure PreCompMDS;

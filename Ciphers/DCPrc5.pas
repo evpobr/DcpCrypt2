@@ -104,6 +104,7 @@ var
   Cipher: TDCP_rc5;
   Data: array[0..1] of dword;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_rc5.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(Plain1,Data);

@@ -1,5 +1,5 @@
 {******************************************************************************}
-{* DCPcrypt v2.0 written by David Barton (crypto@cityinthesky.co.uk) **********}
+{* DCPcrypt v2.1 written by David Barton (crypto@cityinthesky.co.uk) **********}
 {******************************************************************************}
 {* A binary compatible implementation of DES and Triple DES *******************}
 {* Based on C source code by Eric Young ***************************************}
@@ -32,6 +32,8 @@
 {*     <= 192bit key and uses each once (again discarding every 8th bit)      *}
 {******************************************************************************}
 unit DCPdes;
+
+{$INCLUDE '..\dcp.inc'}
 
 interface
 uses
@@ -81,6 +83,10 @@ implementation
 
 {$I DCPdes.inc}
 
+{$IFDEF DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$ENDIF}
+
 procedure hperm_op(var a, t: dword; n, m: dword);
 begin
   t:= ((a shl (16 - n)) xor a) and m;
@@ -98,6 +104,7 @@ procedure TDCP_customdes.DoInit(KeyB: PByteArray; KeyData: PDwordArray);
 var
   c, d, t, s, t2, i: dword;
 begin
+  t := 0;
   c:= KeyB^[0] or (KeyB^[1] shl 8) or (KeyB^[2] shl 16) or (KeyB^[3] shl 24);
   d:= KeyB^[4] or (KeyB^[5] shl 8) or (KeyB^[6] shl 16) or (KeyB^[7] shl 24);
   perm_op(d,c,t,4,$0f0f0f0f);
@@ -144,7 +151,7 @@ var
   i: longint;
 begin
   r:= PDword(@InData)^;
-  l:= PDword(dword(@InData)+4)^;
+  l:= PDword(PointerToInt(@InData)+4)^;
   t:= ((l shr 4) xor r) and $0f0f0f0f;
   r:= r xor t;
   l:= l xor (t shl 4);
@@ -229,7 +236,7 @@ begin
   l:= l xor t;
   r:= r xor (t shl 4);
   PDword(@OutData)^:= l;
-  PDword(dword(@OutData)+4)^:= r;
+  PDword(PointerToInt(@OutData)+4)^:= r;
 end;
 
 procedure TDCP_customdes.DecryptBlock(const InData; var OutData; KeyData: PDWordArray);
@@ -238,7 +245,7 @@ var
   i: longint;
 begin
   r:= PDword(@InData)^;
-  l:= PDword(dword(@InData)+4)^;
+  l:= PDword(PointerToInt(@InData)+4)^;
   t:= ((l shr 4) xor r) and $0f0f0f0f;
   r:= r xor t;
   l:= l xor (t shl 4);
@@ -323,7 +330,7 @@ begin
   l:= l xor t;
   r:= r xor (t shl 4);
   PDword(@OutData)^:= l;
-  PDword(dword(@OutData)+4)^:= r;
+  PDword(PointerToInt(@OutData)+4)^:= r;
 end;
 
 class function TDCP_des.GetMaxKeySize: integer;
@@ -359,6 +366,7 @@ var
   Cipher: TDCP_des;
   Data: array[0..7] of byte;
 begin
+  FillChar(Data, SizeOf(Data), 0);
   Cipher:= TDCP_des.Create(nil);
   Cipher.Init(Key1,Sizeof(Key1)*8,nil);
   Cipher.EncryptECB(InData1,Data);
@@ -433,6 +441,7 @@ var
   Cipher: TDCP_3des;
   Block: array[0..7] of byte;
 begin
+  FillChar(Block, SizeOf(Block), 0);
   Cipher:= TDCP_3des.Create(nil);
   Cipher.Init(Key,Sizeof(Key)*8,nil);
   Cipher.EncryptECB(PlainText,Block);
