@@ -280,6 +280,7 @@ end;
 procedure TDCP_sha384.Init;
 begin
   Burn;
+  {$WARNINGS OFF}
   CurrentHash[0]:= $cbbb9d5dc1059ed8;
   CurrentHash[1]:= $629a292a367cd507;
   CurrentHash[2]:= $9159015a3070dd17;
@@ -288,6 +289,7 @@ begin
   CurrentHash[5]:= $8eb44a8768581511;
   CurrentHash[6]:= $db0c2e0d64f98fa7;
   CurrentHash[7]:= $47b5481dbefa4fa4;
+  {$WARNINGS OFF}
   fInitialized:= true;
 end;
 

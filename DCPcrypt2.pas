@@ -508,7 +508,7 @@ begin
       GetMem(Digest, HashType.GetHashSize div 8);
       Hash := HashType.Create(Self);
       Hash.Init;
-      Hash.UpdateStr(Key);
+      Hash.UpdateUnicodeStr(Key);
       Hash.Final(Digest^);
       Hash.Free;
       if MaxKeySize < HashType.GetHashSize then

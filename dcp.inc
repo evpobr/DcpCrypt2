@@ -3,6 +3,6 @@
 
 {$IF CompilerVersion >= 23 }
 {$define DELPHIXE2_UP}
-{$ENDIF}
+{$IFEND}
 
 { end dcp.inc}
