@@ -24,6 +24,8 @@
 {******************************************************************************}
 unit DCPblockciphers;
 
+
+
 interface
 uses
   Classes, Sysutils, DCPcrypt2;
@@ -121,6 +123,12 @@ type
 implementation
 
 
+{ From XE2 and up the following flag enables conditional compiled pointer-code changes  }
+{$IF CompilerVersion >= 23}
+  {$DEFINE DELPHIXE2_UP}
+  {$POINTERMATH ON}
+{$IFEND}
+
 {** TDCP_blockcipher64 ********************************************************}
 
 procedure TDCP_blockcipher64.IncCounter;
@@ -191,7 +199,7 @@ end;
 procedure TDCP_blockcipher64.EncryptCBC(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -203,8 +211,8 @@ begin
     XorBlock(p2^,CV,8);
     EncryptECB(p2^,p2^);
     Move(p2^,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -217,11 +225,12 @@ end;
 procedure TDCP_blockcipher64.DecryptCBC(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
   Temp: array[0..7] of byte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
+  FillChar(Temp, SizeOf(Temp), 0);
   p1:= @Indata;
   p2:= @Outdata;
   for i:= 1 to (Size div 8) do
@@ -231,8 +240,8 @@ begin
     DecryptECB(p2^,p2^);
     XorBlock(p2^,CV,8);
     Move(Temp,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -252,6 +261,7 @@ begin
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to Size do
   begin
     EncryptECB(CV,Temp);
@@ -274,6 +284,7 @@ begin
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to Size do
   begin
     TempByte:= p1^;
@@ -289,7 +300,7 @@ end;
 procedure TDCP_blockcipher64.EncryptCFBblock(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: Pbyte;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -301,8 +312,8 @@ begin
     Move(p1^,p2^,8);
     XorBlock(p2^,CV,8);
     Move(p2^,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -315,13 +326,14 @@ end;
 procedure TDCP_blockcipher64.DecryptCFBblock(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: Pbyte;
+  p1, p2: PByte;
   Temp: array[0..7] of byte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 8) do
   begin
     Move(p1^,Temp,8);
@@ -329,8 +341,8 @@ begin
     Move(p1^,p2^,8);
     XorBlock(p2^,CV,8);
     Move(Temp,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -343,7 +355,7 @@ end;
 procedure TDCP_blockcipher64.EncryptOFB(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -354,8 +366,8 @@ begin
     EncryptECB(CV,CV);
     Move(p1^,p2^,8);
     XorBlock(p2^,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -368,7 +380,7 @@ end;
 procedure TDCP_blockcipher64.DecryptOFB(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -379,8 +391,8 @@ begin
     EncryptECB(CV,CV);
     Move(p1^,p2^,8);
     XorBlock(p2^,CV,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -394,20 +406,21 @@ procedure TDCP_blockcipher64.EncryptCTR(const Indata; var Outdata; Size: longwor
 var
   temp: array[0..7] of byte;
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 8) do
   begin
     EncryptECB(CV,temp);
     IncCounter;
     Move(p1^,p2^,8);
     XorBlock(p2^,temp,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -422,20 +435,21 @@ procedure TDCP_blockcipher64.DecryptCTR(const Indata; var Outdata; Size: longwor
 var
   temp: array[0..7] of byte;
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 8) do
   begin
     EncryptECB(CV,temp);
     IncCounter;
     Move(p1^,p2^,8);
     XorBlock(p2^,temp,8);
-    p1:= pointer(longword(p1) + 8);
-    p2:= pointer(longword(p2) + 8);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 8; {$ELSE} Inc(p1, 8); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 8; {$ELSE} Inc(p2, 8); {$ENDIF}
   end;
   if (Size mod 8)<> 0 then
   begin
@@ -516,7 +530,7 @@ end;
 procedure TDCP_blockcipher128.EncryptCBC(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -528,8 +542,8 @@ begin
     XorBlock(p2^,CV,16);
     EncryptECB(p2^,p2^);
     Move(p2^,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -542,13 +556,14 @@ end;
 procedure TDCP_blockcipher128.DecryptCBC(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
   Temp: array[0..15] of byte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 16) do
   begin
     Move(p1^,p2^,16);
@@ -556,8 +571,8 @@ begin
     DecryptECB(p2^,p2^);
     XorBlock(p2^,CV,16);
     Move(Temp,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -577,6 +592,7 @@ begin
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to Size do
   begin
     EncryptECB(CV,Temp);
@@ -599,6 +615,7 @@ begin
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to Size do
   begin
     TempByte:= p1^;
@@ -614,7 +631,7 @@ end;
 procedure TDCP_blockcipher128.EncryptCFBblock(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: Pbyte;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -626,8 +643,8 @@ begin
     Move(p1^,p2^,16);
     XorBlock(p2^,CV,16);
     Move(p2^,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -640,13 +657,14 @@ end;
 procedure TDCP_blockcipher128.DecryptCFBblock(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: Pbyte;
+  p1, p2: PByte;
   Temp: array[0..15] of byte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 16) do
   begin
     Move(p1^,Temp,16);
@@ -654,8 +672,8 @@ begin
     Move(p1^,p2^,16);
     XorBlock(p2^,CV,16);
     Move(Temp,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -668,7 +686,7 @@ end;
 procedure TDCP_blockcipher128.EncryptOFB(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -679,8 +697,8 @@ begin
     EncryptECB(CV,CV);
     Move(p1^,p2^,16);
     XorBlock(p2^,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -693,7 +711,7 @@ end;
 procedure TDCP_blockcipher128.DecryptOFB(const Indata; var Outdata; Size: longword);
 var
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
@@ -704,8 +722,8 @@ begin
     EncryptECB(CV,CV);
     Move(p1^,p2^,16);
     XorBlock(p2^,CV,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -719,20 +737,21 @@ procedure TDCP_blockcipher128.EncryptCTR(const Indata; var Outdata; Size: longwo
 var
   temp: array[0..15] of byte;
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 16) do
   begin
     EncryptECB(CV,temp);
     IncCounter;
     Move(p1^,p2^,16);
     XorBlock(p2^,temp,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
@@ -747,20 +766,21 @@ procedure TDCP_blockcipher128.DecryptCTR(const Indata; var Outdata; Size: longwo
 var
   temp: array[0..15] of byte;
   i: longword;
-  p1, p2: pointer;
+  p1, p2: PByte;
 begin
   if not fInitialized then
     raise EDCP_blockcipher.Create('Cipher not initialized');
   p1:= @Indata;
   p2:= @Outdata;
+  FillChar(Temp, SizeOf(Temp), 0);
   for i:= 1 to (Size div 16) do
   begin
     EncryptECB(CV,temp);
     IncCounter;
     Move(p1^,p2^,16);
     XorBlock(p2^,temp,16);
-    p1:= pointer(longword(p1) + 16);
-    p2:= pointer(longword(p2) + 16);
+    {$IFDEF DELPHIXE2_UP} p1:= PByte(p1) + 16; {$ELSE} Inc(p1, 16); {$ENDIF}
+    {$IFDEF DELPHIXE2_UP} p2:= PByte(p2) + 16; {$ELSE} Inc(p2, 16); {$ENDIF}
   end;
   if (Size mod 16)<> 0 then
   begin
