@@ -1,25 +1,33 @@
      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-     =       DCPcrypt Cryptographic Component Library v2       =
+     =       DCPcrypt Cryptographic Component Library v2.1     =
+     =                                                         =
      =          Copyright (c) 1999-2009 David Barton           =
-     =             http://www.cityinthesky.co.uk/              =
-     =               crypto@cityinthesky.co.uk                 =
+     =                                                         =
+     =         Further Changes by Henri Gourvest,              =
+     =             Warren Postma and others                    =
+     =           to support Delphi XE and up.                  =
+     =                                                         =
+     =   	warren.postma@gmail.com                        =
+     =     https://bitbucket.org/wpostma/dcpcrypt2010          =
+     =                                                         =
      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=    
 
-UPDATE:
-
-Included is an update for Delphi 2009 by Henri Gourvest. Note: I have
-not tested this myself (I don't have Delphi 2009)
-
+UPDATE JANUARY 2014:
+ Updated and tested with Delphi 2009, 2010, XE, XE2, XE3, XE4, XE5
+ by Warren Postma.  
+  
+ Please report bugs on Delphi versions XE or newer at bitbucket
+ here: https://bitbucket.org/wpostma/dcpcrypt2010
 
 Introduction:
 
-DCPcrypt is a collection of cryptographic components for the Borland
-Delphi(tm), C++ Builder(tm) and Kylix(tm) programming languages. The 
-supported versions are Delphi 4, 5, 6, 7, 2005, C++ Builder (3?), 4, 
-5, (6?) and Kylix 1 (untested), 2 and 3 (untested).
+DCPcrypt is a collection of cryptographic components for Delphi, 
+and C++ Builder. Version 2.1 should work with almost all versions of
+Delphi, from ancient versions like Delphi 5 to the latest versions as
+of 2014, which is Delphi XE5. 
 
-Thanks to Manuel C. for the modifications to make DCPcrypt work under
-Delphi 2005!
+** The remainder of this introduction was written around 2003 and 
+ has not been modified since then, and was written by David Barton. **
 
 The idea behind DCPcrypt is that it should be possible to "drop in"
 any algorithm implementation to replace another with minimum or no
