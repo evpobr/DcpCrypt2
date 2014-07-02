@@ -52,6 +52,9 @@ type
 implementation
 {$R-}{$Q-}
 
+uses  ORawByteString
+    ;
+
 function SwapDWord(a: dword): dword;
 begin
   Result:= ((a and $FF) shl 24) or ((a and $FF00) shl 8) or ((a and $FF0000) shr 8) or ((a and $FF000000) shr 24);

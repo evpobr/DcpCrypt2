@@ -25,8 +25,9 @@
 unit DCPbase64;
 
 interface
-uses
-  Sysutils;
+uses  ORawByteString
+    , Sysutils
+    ;
 
 function Base64EncodeStr(const Value: AnsiString): AnsiString; overload;
   { Encode a string into Base64 format }
@@ -89,8 +90,13 @@ end;
 
 function Base64EncodeStr(const Value: AnsiString): AnsiString;
 begin
+{$IFDEF NEXTGEN}
+  Result.SetLength( ((AnsiLength(Value)+2) div 3) * 4);
+  Base64Encode(@Value.GetBuffer[0],@Result.GetBuffer[0],AnsiLength(Value));
+{$ELSE}
   SetLength(Result,((Length(Value)+2) div 3) * 4);
   Base64Encode(@Value[1],@Result[1],Length(Value));
+{$ENDIF}
 end;
 
 {$IFDEF UNICODE}
@@ -98,8 +104,13 @@ function Base64EncodeStr(const Value: UnicodeString): UnicodeString;
 var
   temp: AnsiString;
 begin
+{$IFDEF NEXTGEN}
+  temp.SetLength(((Length(Value)*SizeOf(Value[1])+2) div 3) * 4);
+  Base64Encode(@Value[1],@temp.GetBuffer[0],Length(Value)*SizeOf(Value[1]));
+{$ELSE}
   SetLength(temp,(((Length(Value)*SizeOf(Value[1])+2) div 3) * 4));
   Base64Encode(@Value[1],@temp[1],Length(Value)*SizeOf(Value[1]));
+{$ENDIF}
   Result:= UnicodeString(temp);
 end;
 {$ENDIF}
@@ -148,8 +159,13 @@ end;
 
 function Base64DecodeStr(const Value: AnsiString): AnsiString;
 begin
+{$IFDEF NEXTGEN}
+  Result.SetLength((AnsiLength(Value) div 4) * 3);
+  Result.SetLength(Base64Decode(@Value.GetBuffer[0],@Result.GetBuffer[0],AnsiLength(Value)));
+{$ELSE}
   SetLength(Result,(Length(Value) div 4) * 3);
   SetLength(Result,Base64Decode(@Value[1],@Result[1],Length(Value)));
+{$ENDIF}
 end;
 
 {$IFDEF UNICODE}
@@ -158,8 +174,13 @@ var
   temp: AnsiString;
 begin
   temp:= AnsiString(Value);
+{$IFDEF NEXTGEN}
+  SetLength(Result,(AnsiLength(temp) div 4) * 3);
+  SetLength(Result,Base64Decode(@temp.GetBuffer[0],@Result[1],AnsiLength(temp)) div SizeOf(Result[1]));
+{$ELSE}
   SetLength(Result,(Length(temp) div 4) * 3);
   SetLength(Result,Base64Decode(@temp[1],@Result[1],Length(temp)) div SizeOf(Result[1]));
+{$ENDIF}
 end;
 {$ENDIF}
 

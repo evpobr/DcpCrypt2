@@ -29,8 +29,9 @@ unit DCPcrypt2;
 
 interface
 
-uses
-   Classes, Types, Sysutils, DCPbase64;
+uses  ORawByteString
+    , Classes, Types, Sysutils, DCPbase64
+    ;
 
 
 { Enable this block to enable a unicode string Encrypt/Decrypt feature that is
@@ -308,7 +309,11 @@ procedure XorBlock(var InData1, InData2; Size: longword);
 
 implementation
 
+{$IFDEF MSWINDOWS}
 uses Windows;
+{$ENDIF}
+
+
 {$Q-}{$R-}
 { ** TDCP_hash ***************************************************************** }
 
@@ -391,7 +396,11 @@ end;
 
 procedure TDCP_hash.UpdateStr(const Str: RawByteString);
 begin
-   Update(Str[1], Length(Str));
+{$IFDEF NEXTGEN}
+  Update(Str.GetBuffer[0], AnsiLength(Str));
+{$ELSE}
+  Update(Str[1], Length(Str));
+{$ENDIF}
 end;
 
 {$IFDEF UNICODE_CIPHER}
@@ -616,16 +625,27 @@ begin
 end;
 
 function TDCP_cipher.EncryptString(const Str: RawByteString): RawByteString;
+var
+  lLength : integer;
 begin
-   SetLength(Result, Length(Str));
-   Encrypt(Str[1], Result[1], Length(Str));
+{$IFDEF NEXTGEN}
+  Result.SetLength(AnsiLength(Str));
+  Encrypt(Str.GetBuffer[0], Result.GetBuffer[0], AnsiLength(Str));
+{$ELSE}
+  SetLength(Result, Length(Str));
+  Encrypt(Str[1], Result[1], Length(Str));
+{$ENDIF}
    Result := Base64EncodeStr(Result);
 end;
 
 function TDCP_cipher.DecryptString(const Str: RawByteString): RawByteString;
 begin
    Result := Base64DecodeStr(Str);
-   Decrypt(Result[1], Result[1], Length(Result));
+{$IFDEF NEXTGEN}
+  Decrypt(Result.GetBuffer[0], Result.GetBuffer[0], AnsiLength(Result));
+{$ELSE}
+  Decrypt(Result[1], Result[1], Length(Result));
+{$ENDIF}
 end;
 
 {$IFDEF UNICODE_CIPHER}
@@ -698,15 +718,24 @@ end;
 
 function TDCP_blockcipher.EncryptString(const Str: RawByteString): RawByteString;
 begin
-   SetLength(Result, Length(Str));
-   EncryptCFB8bit(Str[1], Result[1], Length(Str));
+{$IFDEF NEXTGEN}
+  Result.SetLength(AnsiLength(Str));
+  EncryptCFB8bit(Str.GetBuffer[0], Result.GetBuffer[0], AnsiLength(Str));
+{$ELSE}
+  SetLength(Result, Length(Str));
+  EncryptCFB8bit(Str[1], Result[1], Length(Str));
+{$ENDIF}
    Result := Base64EncodeStr(Result);
 end;
 
 function TDCP_blockcipher.DecryptString(const Str: RawByteString): RawByteString;
 begin
    Result := Base64DecodeStr(Str);
-   DecryptCFB8bit(Result[1], Result[1], Length(Result));
+{$IFDEF NEXTGEN}
+  DecryptCFB8bit(Result.GetBuffer[0], Result.GetBuffer[0], AnsiLength(Result));
+{$ELSE}
+  DecryptCFB8bit(Result[1], Result[1], Length(Result));
+{$ENDIF}
 end;
 
 {$IFDEF UNICODE_CIPHER}
