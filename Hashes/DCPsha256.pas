@@ -52,8 +52,9 @@ type
 implementation
 {$R-}{$Q-}
 
-uses  ORawByteString
-    ;
+{$ifdef NEXTGEN_FIXES}
+uses  ORawByteString;
+{$endif}
 
 function SwapDWord(a: dword): dword;
 begin

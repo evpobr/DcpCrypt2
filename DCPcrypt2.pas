@@ -29,9 +29,13 @@ unit DCPcrypt2;
 
 interface
 
-uses  ORawByteString
-    , Classes, Types, Sysutils, DCPbase64
-    ;
+uses  {$ifdef NEXTGEN_FIXES}
+      ORawByteString,
+      {$endif}
+      Classes,
+      Types,
+      Sysutils,
+      DCPbase64;
 
 
 { Enable this block to enable a unicode string Encrypt/Decrypt feature that is

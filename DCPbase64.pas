@@ -25,9 +25,13 @@
 unit DCPbase64;
 
 interface
-uses  ORawByteString
-    , Sysutils
-    ;
+
+
+uses
+  {$ifdef NEXTGEN_FIXES}
+    ORawByteString,
+  {$endif}
+     Sysutils;
 
 function Base64EncodeStr(const Value: AnsiString): AnsiString; overload;
   { Encode a string into Base64 format }
