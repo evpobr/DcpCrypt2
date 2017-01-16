@@ -1,0 +1,4 @@
+* text=auto
+*.dfm	eol=crlf
+*.dof	eol=crlf
+*.dproj	eol=crlf
